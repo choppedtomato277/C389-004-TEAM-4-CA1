@@ -1,4 +1,3 @@
-Use this version without tables:
 
 ```markdown
 # People Counting and Waiting-Area Analysis
