@@ -1,3 +1,5 @@
+Use this version without tables:
+
 ```markdown
 # People Counting and Waiting-Area Analysis
 
@@ -9,30 +11,39 @@ The system uses a YOLO-based model with ByteTrack tracking and provides a Gradio
 
 - People detection using a trained YOLO model
 - Person tracking across video frames
-- Direction classification:
+- Movement classification:
   - `person_left`
   - `person_right`
 - User-defined left and right waiting areas
 - Waiting detection based on:
   - Time spent inside the ROI
-  - Maximum movement speed in pixels per second
+  - Maximum speed in pixels per second
   - Detection-gap tolerance
   - ROI edge tolerance
 - Optional video stabilisation
 - Annotated video output
 - JSON analysis results
-- Interactive Gradio web interface
+- Interactive Gradio interface
 
-## Files
+## Project Files
 
-| File | Description |
-|---|---|
-| `L4_local_laptop.ipynb` | Main notebook containing the detection, tracking, ROI analysis, and Gradio interface |
-| `best_1.pt` | Trained YOLO model used for person detection and classification |
+### `L4_local_laptop.ipynb`
+
+The main notebook containing:
+
+- People detection
+- Video tracking
+- ROI selection
+- Waiting detection
+- Speed calculation
+- Video annotation
+- Gradio interface
+
+### `best_1.pt`
+
+The trained YOLO model used for people detection and classification.
 
 ## Requirements
-
-Recommended environment:
 
 - Python 3.10 or later
 - Jupyter Notebook or JupyterLab
@@ -43,32 +54,28 @@ Recommended environment:
 - Pillow
 - Matplotlib
 
-Install the main dependencies with:
+Install the dependencies:
 
 ```bash
 pip install opencv-python numpy ultralytics gradio pillow matplotlib
 ```
 
-## Running the Notebook
+## Running the Project
 
-1. Clone the repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/choppedtomato277/C239-004-TEAM-4-CA1.git
 cd C239-004-TEAM-4-CA1
 ```
 
-2. Open the notebook:
+Open the notebook:
 
 ```bash
 jupyter notebook L4_local_laptop.ipynb
 ```
 
-3. Run the notebook cells in order.
-
-4. Run the final Gradio interface cell.
-
-5. Open the generated local or public Gradio URL.
+Run the notebook cells in order. Finally, run the Gradio interface cell and open the generated URL.
 
 ## Using the Interface
 
@@ -76,7 +83,7 @@ jupyter notebook L4_local_laptop.ipynb
 
 1. Upload a photograph.
 2. Adjust the photo confidence threshold if necessary.
-3. Run the analysis.
+3. Click `Count or analyse`.
 4. View the annotated image and JSON response.
 
 ### Video Analysis
@@ -84,13 +91,13 @@ jupyter notebook L4_local_laptop.ipynb
 1. Upload a video clip.
 2. Use the first-frame previews to draw the waiting areas.
 3. Select exactly four points for each ROI.
-4. Configure the analysis sliders.
+4. Configure the sliders.
 5. Click `Count or analyse`.
 6. View the annotated video and JSON response.
 
-If an ROI is not provided by the user, that ROI is not drawn and is not included in the waiting-area analysis.
+If the user does not provide an ROI, that ROI is not drawn or analysed.
 
-## Configuration Sliders
+## Configuration
 
 ### Photo Confidence Threshold
 
@@ -102,15 +109,13 @@ Controls the minimum confidence required for video detections.
 
 ### Minimum Time in ROI
 
-The minimum amount of time a person must remain inside an ROI before being considered waiting.
+The minimum time a person must remain inside an ROI before being classified as waiting.
 
 ### Maximum Waiting Speed
 
-The maximum allowed movement speed in pixels per second.
+The maximum movement speed allowed for a person to be classified as waiting.
 
-The system calculates the median speed between consecutive tracked foot points. A person is classified as waiting only when their median speed is at or below the selected limit.
-
-The default recommended value is:
+Speed is measured in image pixels per second using the tracked foot points. The default value is:
 
 ```text
 30 pixels per second
@@ -118,7 +123,7 @@ The default recommended value is:
 
 ### Allowed Detection Gap
 
-Allows brief periods where a person is not detected without immediately ending the same waiting event.
+Allows brief periods where a person is not detected without ending the same waiting event.
 
 ### Edge Tolerance
 
@@ -126,38 +131,39 @@ Allows a person's detected foot points to be slightly outside the ROI boundary.
 
 ### Stabilisation
 
-Optional video stabilisation for footage recorded with a moving or shaking camera.
+Optionally stabilises video footage recorded with a moving or shaking camera.
 
 ## Waiting Detection Logic
 
-A person is reported as waiting only when all of the following conditions are satisfied:
+A person is classified as waiting only when:
 
 1. The person is successfully tracked.
-2. Their tracked foot points are inside or near a user-defined ROI.
+2. Their foot points are inside or near a user-defined ROI.
 3. Their dwell time meets the minimum ROI duration.
-4. Their median movement speed is below the selected maximum speed.
-5. Detection gaps do not exceed the configured gap tolerance.
+4. Their median speed is below the selected maximum speed.
+5. Detection gaps remain within the configured tolerance.
 
 ## Output
 
-The system produces:
+The system produces an annotated video showing:
 
-- An annotated video showing:
-  - Detected people
-  - Track IDs
-  - Movement class
-  - Waiting status
-  - Configured ROI boundaries
-- A JSON response containing:
-  - Total people counts
-  - Direction counts
-  - Waiting count
-  - Waiting area
-  - Track IDs
-  - Start and end times
-  - Dwell duration
-  - Median speed
-  - Maximum observed speed
+- Detected people
+- Track IDs
+- Movement class
+- Waiting status
+- User-defined ROI boundaries
+
+The JSON response contains:
+
+- People counts
+- Direction counts
+- Waiting count
+- Waiting areas
+- Track IDs
+- Start and end times
+- Dwell duration
+- Median speed
+- Maximum observed speed
 
 Example waiting result:
 
@@ -174,28 +180,16 @@ Example waiting result:
 }
 ```
 
-## Model
+## Important Notes
 
-The model file is:
-
-```text
-best_1.pt
-```
-
-The notebook loads this model for video tracking and analysis. Ensure that the model file remains in the same directory as the notebook unless the model path is updated in the notebook configuration.
-
-## Notes
-
-- The ROI coordinates are based on the uploaded video's frame dimensions.
-- ROIs should be drawn carefully around the intended waiting areas.
-- Avoid overlapping left and right ROIs because the same person may be detected in both regions.
-- The speed threshold is measured in image pixels per second, not real-world distance.
-- A different camera angle, resolution, or perspective may require new ROI coordinates and speed calibration.
-- The generated public Gradio link is temporary and should not be treated as a permanent deployment.
+- ROI coordinates are based on the uploaded video's frame dimensions.
+- Draw ROIs carefully around the intended waiting areas.
+- Avoid overlapping left and right ROIs.
+- Speed is measured in pixels per second, not real-world distance.
+- Different cameras and resolutions may require new ROI coordinates.
+- The public Gradio link is temporary and should not be treated as a permanent deployment.
 
 ## Repository
-
-Repository:
 
 https://github.com/choppedtomato277/C239-004-TEAM-4-CA1
 ```
